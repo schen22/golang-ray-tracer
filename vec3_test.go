@@ -1,22 +1,18 @@
 package main
 
-import (
-	"fmt"
-	"testing"
-)
+import "testing"
 
 func TestVec3MultiplyNum(t *testing.T) {
-	var vec Vec3
-	vec = Vec3{1, 0.1, -2}
-	expectedVec := Vec3{1, 0.1, -2}
+	var vec Vec3 = Vec3{1, 0.1, -2}
+	var expectedVec Vec3 = Vec3{1, 0.1, -2}
 	if vec != expectedVec {
-		t.Error("Expected {1 0.1 -2}, got ", vec)
+		t.Error("Expected ", expectedVec, "got ", vec)
 	}
 
-	vec1 := vec.MultiplyNum(2)
-	expectedVec1 := Vec3{2, 0.2, -4}
+	var vec1 Vec3 = vec.MultiplyNum(2)
+	var expectedVec1 Vec3 = Vec3{2, 0.2, -4}
 	if vec1 != expectedVec1 {
-		t.Error("Expected {2 0.2 -4}, got ", vec1)
+		t.Error("Expected ", expectedVec1, ", got ", vec1)
 	}
 }
 
@@ -34,7 +30,7 @@ func TestVec3FindUnitVector(t *testing.T) {
 	vec1 := Vec3{1, 2, 2}
 	u := vec1.FindUnitVector()
 	expectedVec1 := Vec3{float64(1) / float64(3), float64(2) / float64(3), float64(2) / float64(3)}
-	fmt.Println("unit vector = ", expectedVec1)
+	// fmt.Println("unit vector = ", expectedVec1)
 	if u != expectedVec1 {
 		t.Error("Expected", expectedVec1, "got", u)
 	}
