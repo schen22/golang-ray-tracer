@@ -16,7 +16,7 @@ func hitSphere(center Vec3, radius float64, ray Ray) float64 {
 	if discriminant < 0 {
 		return -1.0
 	} else {
-		return (-b - math.Sqrt(discriminant)) / 2.0 * a
+		return (-b - math.Sqrt(discriminant)) / (2.0 * a)
 	}
 }
 
@@ -24,11 +24,12 @@ func hitSphere(center Vec3, radius float64, ray Ray) float64 {
 depending on up/downess of the y-coordinate. */
 func color(r Ray) Vec3 {
 	// If any pixel hits the sphere placed at -1 on the z-axis,
-	// color the pixel red
+	// color the pixel by mapping surface normal to its RGB value.
 	sphere := Vec3{0, 0, -1}
 	t := hitSphere(sphere, 0.5, r)
 	if t > 0.0 {
-		N := r.PointAtParam(t).FindUnitVector().SubtractVector(sphere)
+		// Make surface normals unit vectors and normalize.
+		N := r.PointAtParam(t).SubtractVector(sphere).FindUnitVector()
 		return Vec3{N.x() + 1, N.y() + 1, N.z() + 1}.MultiplyNum(0.5)
 	}
 	unitDirection := r.direction.FindUnitVector()
