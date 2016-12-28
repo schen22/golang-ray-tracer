@@ -9,7 +9,7 @@ func color(r Ray) Vec3 {
 	// Scale unit vector so that 0.0 < t < 1.0
 	var t float64 = 0.5 * (unitDirection.y() + 1.0)
 	// Form a linear interpolation between blue to white
-	startVal := Vec3{1, 1, 1}.MultiplyNum(1.0 - t)
+	startVal := Vec3{1.0, 1.0, 1.0}.MultiplyNum(1.0 - t)
 	endVal := Vec3{0.5, 0.7, 1.0}.MultiplyNum(t)
 	blendedVal := startVal.AddVector(endVal)
 	return blendedVal
@@ -28,14 +28,14 @@ func main() {
 		for i := 0; i < nx; i++ {
 			u := float64(i) / float64(nx)
 			v := float64(j) / float64(ny)
-			horizontal = horizontal.MultiplyNum(u)
-			vertical = vertical.MultiplyNum(v)
-			direction := lowerLeftCorner.AddVector(horizontal).AddVector(vertical)
+			scaleHoriz := horizontal.MultiplyNum(u)
+			scaleVert := vertical.MultiplyNum(v)
+			direction := lowerLeftCorner.AddVector(scaleVert).AddVector(scaleHoriz)
 			ray := Ray{origin, direction}
 			col := color(ray)
-			ir := int(255.99 * col.x())
-			ig := int(255.99 * col.y())
-			ib := int(255.99 * col.z())
+			ir := int(255.99 * col.e0)
+			ig := int(255.99 * col.e1)
+			ib := int(255.99 * col.e2)
 			fmt.Printf("%d %d %d\n", ir, ig, ib)
 		}
 	}
