@@ -60,7 +60,7 @@ func (v0 Vec3) MultiplyVector(v1 Vec3) Vec3 {
 func (v0 Vec3) DivideVector(v1 Vec3) Vec3 {
 	return Vec3{v0.e0 / v1.e0, v0.e1 / v1.e1, v0.e2 / v1.e2}
 }
-func (v0 Vec3) DotProduct(v1 Vec3) float64 {
+func (v0 Vec3) Dot(v1 Vec3) float64 {
 	return v0.e0*v1.e0 + v0.e1*v1.e1 + v0.e2*v1.e2
 }
 func (v0 Vec3) Cross(v1 Vec3) Vec3 {
