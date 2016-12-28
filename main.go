@@ -1,16 +1,23 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 // Calculate when any pixel hits the sphere (represented by the
 // center point of a vector).
-func hitSphere(center Vec3, radius float64, ray Ray) bool {
+func hitSphere(center Vec3, radius float64, ray Ray) float64 {
 	oc := ray.origin.SubtractVector(center)
 	a := ray.direction.Dot(ray.direction)
 	b := 2.0 * oc.Dot(ray.direction)
 	c := oc.Dot(oc) - radius*radius
 	discriminant := b*b - 4*a*c
-	return (discriminant > 0)
+	if discriminant < 0 {
+		return -1.0
+	} else {
+		return (-b - math.Sqrt(discriminant)) / 2.0 * a
+	}
 }
 
 /** Linearly blend white and blue
@@ -18,12 +25,15 @@ depending on up/downess of the y-coordinate. */
 func color(r Ray) Vec3 {
 	// If any pixel hits the sphere placed at -1 on the z-axis,
 	// color the pixel red
-	if (hitSphere(Vec3{0, 0, -1}, 0.5, r)) {
-		return Vec3{1, 0, 0}
+	sphere := Vec3{0, 0, -1}
+	t := hitSphere(sphere, 0.5, r)
+	if t > 0.0 {
+		N := r.PointAtParam(t).FindUnitVector().SubtractVector(sphere)
+		return Vec3{N.x() + 1, N.y() + 1, N.z() + 1}.MultiplyNum(0.5)
 	}
 	unitDirection := r.direction.FindUnitVector()
 	// Scale unit vector so that 0.0 < t < 1.0
-	var t float64 = 0.5 * (unitDirection.y() + 1.0)
+	t = 0.5 * (unitDirection.y() + 1.0)
 	// Form a linear interpolation between blue to white
 	startVal := Vec3{1.0, 1.0, 1.0}.MultiplyNum(1.0 - t)
 	endVal := Vec3{0.5, 0.7, 1.0}.MultiplyNum(t)
