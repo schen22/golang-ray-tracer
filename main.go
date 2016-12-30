@@ -26,7 +26,7 @@ depending on up/downess of the y-coordinate. */
 func color(r models.Ray) models.Vec3 {
 	// If any pixel hits the sphere placed at -1 on the z-axis,
 	// color the pixel by mapping surface normal to its RGB value.
-	sphere := models.Vector(0, 0, 1)
+	sphere := models.Vector(0, 0, -1)
 	t := hitSphere(sphere, 0.5, r)
 	if t > 0.0 {
 		// Make surface normals unit vectors and normalize.
