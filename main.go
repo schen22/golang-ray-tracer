@@ -3,44 +3,29 @@ package main
 import (
 	"fmt"
 	"golang-ray-tracer/models"
+	"golang-ray-tracer/objects"
 	"math"
 )
 
-// Calculate when any pixel hits the sphere (represented by the
-// center point of a vector).
-func hitSphere(center models.Vec3, radius float64, ray models.Ray) float64 {
-	oc := ray.Origin.SubtractVector(center)
-	a := ray.Direction.Dot(ray.Direction)
-	b := 2.0 * oc.Dot(ray.Direction)
-	c := oc.Dot(oc) - radius*radius
-	discriminant := b*b - 4*a*c
-	if discriminant < 0 {
-		return -1.0
-	} else {
-		return (-b - math.Sqrt(discriminant)) / (2.0 * a)
-	}
-}
-
 /** Linearly blend white and blue
 depending on up/downess of the y-coordinate. */
-func color(r models.Ray) models.Vec3 {
-	// If any pixel hits the sphere placed at -1 on the z-axis,
-	// color the pixel by mapping surface normal to its RGB value.
-	sphere := models.Vector(0, 0, -1)
-	t := hitSphere(sphere, 0.5, r)
-	if t > 0.0 {
-		// Make surface normals unit vectors and normalize.
-		N := r.PointAtParam(t).SubtractVector(sphere).FindUnitVector()
-		return models.Vector(N.X()+1, N.Y()+1, N.Z()+1).MultiplyNum(0.5)
+func color(r models.Ray, world objects.Hitable) models.Vec3 {
+	var rec objects.HitRecord
+
+	if world.Hit(r, 0.0, math.MaxFloat64, &rec) {
+		// fmt.Printf("rec normal object = %v", rec.Normal.X())
+
+		return models.Vector(rec.Normal.X()+1, rec.Normal.Y()+1, rec.Normal.Z()+1).MultiplyNum(0.5)
+	} else {
+		unitDirection := r.Direction.FindUnitVector()
+		// Scale unit vector so that 0.0 < t < 1.0
+		t := 0.5 * (unitDirection.Y() + 1.0)
+		// Form a linear interpolation between blue to white
+		startVal := models.Vector(1.0, 1.0, 1.0).MultiplyNum(1.0 - t)
+		endVal := models.Vector(0.5, 0.7, 1.0).MultiplyNum(t)
+		blendedVal := startVal.AddVector(endVal)
+		return blendedVal
 	}
-	unitDirection := r.Direction.FindUnitVector()
-	// Scale unit vector so that 0.0 < t < 1.0
-	t = 0.5 * (unitDirection.Y() + 1.0)
-	// Form a linear interpolation between blue to white
-	startVal := models.Vector(1.0, 1.0, 1.0).MultiplyNum(1.0 - t)
-	endVal := models.Vector(0.5, 0.7, 1.0).MultiplyNum(t)
-	blendedVal := startVal.AddVector(endVal)
-	return blendedVal
 }
 
 func main() {
@@ -51,6 +36,10 @@ func main() {
 	horizontal := models.Vector(4, 0, 0)
 	vertical := models.Vector(0, 2, 0)
 	origin := models.Vector(0, 0, 0)
+	list := make([]objects.Hitable, 2)
+	list[0] = objects.Sphere{Center: models.Vector(0, 0, -1), Radius: 0.5}
+	list[1] = objects.Sphere{Center: models.Vector(0, -100.5, -1), Radius: 100}
+	world := objects.HitableList{List: list, ListSize: 2}
 	fmt.Printf("P3\n%d %d\n255\n", nx, ny)
 	for j := ny - 1; j >= 0; j-- {
 		for i := 0; i < nx; i++ {
@@ -59,8 +48,10 @@ func main() {
 			scaleHoriz := horizontal.MultiplyNum(u)
 			scaleVert := vertical.MultiplyNum(v)
 			direction := lowerLeftCorner.AddVector(scaleVert).AddVector(scaleHoriz)
-			ray := models.Ray{origin, direction}
-			col := color(ray)
+			ray := models.Ray{Origin: origin, Direction: direction}
+
+			// p := ray.PointAtParam(2.0)
+			col := color(ray, world)
 			ir := int(255.99 * col.E0)
 			ig := int(255.99 * col.E1)
 			ib := int(255.99 * col.E2)

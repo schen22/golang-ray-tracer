@@ -1,13 +1,16 @@
-package models
+package objects
 
-type hitRecord struct {
-	t      float64
-	p      Vec3
-	normal Vec3
+import "golang-ray-tracer/models"
+
+// t = time to allow motion blur.
+// p = point vector, normal = the normal of that vector
+type HitRecord struct {
+	T         float64
+	P, Normal models.Vec3
 }
 
-type hitable interface {
-  func hit(r Ray, t_min float64, t_max float64, rec hitRecord) bool {
-
-  }
+type Hitable interface {
+	// Determine if ray object will be hit within the interval
+	// tmin < t < tmax.
+	Hit(r models.Ray, t_min float64, t_max float64, rec *HitRecord) bool
 }
