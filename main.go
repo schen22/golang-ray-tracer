@@ -14,7 +14,8 @@ func color(r models.Ray, world objects.Hitable) models.Vec3 {
 	var rec objects.HitRecord
 
 	if world.Hit(r, 0.0, math.MaxFloat64, &rec) {
-		return models.Vector(rec.Normal.X()+1, rec.Normal.Y()+1, rec.Normal.Z()+1).MultiplyNum(0.5)
+		target := rec.P.AddVector(rec.Normal).AddVector(randomInUnitSphere())
+		return color(models.NewRay(rec.P, target.SubtractVector(rec.P)), world).MultiplyNum(0.5)
 	} else {
 		unitDirection := r.Direction.FindUnitVector()
 		// Scale unit vector so that 0.0 < t < 1.0
@@ -25,6 +26,19 @@ func color(r models.Ray, world objects.Hitable) models.Vec3 {
 		blendedVal := startVal.AddVector(endVal)
 		return blendedVal
 	}
+}
+
+func randomInUnitSphere() models.Vec3 {
+	var p models.Vec3
+	for {
+		p = models.Vec3{E0: rand.Float64(), E1: rand.Float64(), E2: rand.Float64()}
+		p = p.MultiplyNum(2.0)
+		p = p.SubtractVector(models.Vector(1, 1, 1))
+		if p.SquaredLength() >= 1.0 {
+			break
+		}
+	}
+	return p
 }
 
 func main() {
