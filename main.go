@@ -13,7 +13,7 @@ depending on up/downess of the y-coordinate. */
 func color(r models.Ray, world objects.Hitable) models.Vec3 {
 	var rec objects.HitRecord
 
-	if world.Hit(r, 0.0, math.MaxFloat64, &rec) {
+	if world.Hit(r, 0.001, math.MaxFloat64, &rec) {
 		target := rec.P.AddVector(rec.Normal).AddVector(randomInUnitSphere())
 		return color(models.NewRay(rec.P, target.SubtractVector(rec.P)), world).MultiplyNum(0.5)
 	} else {
@@ -68,6 +68,7 @@ func main() {
 				col = col.AddVector(color(r, world))
 			}
 			col = col.DivideNum(float64(ns))
+			col = models.Vector(math.Sqrt(col.E0), math.Sqrt(col.E1), math.Sqrt(col.E2))
 			ir := int(255.99 * col.E0)
 			ig := int(255.99 * col.E1)
 			ib := int(255.99 * col.E2)
