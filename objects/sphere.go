@@ -22,7 +22,6 @@ func (s Sphere) Hit(r models.Ray, t_min float64, t_max float64, rec *HitRecord) 
 			rec.T = temp
 			rec.P = r.PointAtParam(rec.T)
 			rec.Normal = rec.P.SubtractVector(s.Center).DivideNum(s.Radius)
-			// fmt.Printf("rec.normal = %v", rec.Normal)
 			return true
 		}
 		temp = (-b + math.Sqrt(b*b-a*c)) / a
@@ -30,7 +29,6 @@ func (s Sphere) Hit(r models.Ray, t_min float64, t_max float64, rec *HitRecord) 
 			rec.T = temp
 			rec.P = r.PointAtParam(rec.T)
 			rec.Normal = rec.P.SubtractVector(s.Center).DivideNum(s.Radius)
-			// fmt.Printf("rec.normal = %v", rec.Normal)
 			return true
 		}
 	}

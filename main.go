@@ -5,6 +5,7 @@ import (
 	"golang-ray-tracer/models"
 	"golang-ray-tracer/objects"
 	"math"
+	"math/rand"
 )
 
 /** Linearly blend white and blue
@@ -13,8 +14,6 @@ func color(r models.Ray, world objects.Hitable) models.Vec3 {
 	var rec objects.HitRecord
 
 	if world.Hit(r, 0.0, math.MaxFloat64, &rec) {
-		// fmt.Printf("rec normal object = %v", rec.Normal.X())
-
 		return models.Vector(rec.Normal.X()+1, rec.Normal.Y()+1, rec.Normal.Z()+1).MultiplyNum(0.5)
 	} else {
 		unitDirection := r.Direction.FindUnitVector()
@@ -31,6 +30,7 @@ func color(r models.Ray, world objects.Hitable) models.Vec3 {
 func main() {
 	nx := 200
 	ny := 100
+	ns := 100
 
 	lowerLeftCorner := models.Vector(-2, -1, -1)
 	horizontal := models.Vector(4, 0, 0)
@@ -40,18 +40,20 @@ func main() {
 	list[0] = objects.Sphere{Center: models.Vector(0, 0, -1), Radius: 0.5}
 	list[1] = objects.Sphere{Center: models.Vector(0, -100.5, -1), Radius: 100}
 	world := objects.HitableList{List: list, ListSize: 2}
+	cam := objects.NewCamera(origin, lowerLeftCorner, horizontal, vertical)
 	fmt.Printf("P3\n%d %d\n255\n", nx, ny)
 	for j := ny - 1; j >= 0; j-- {
 		for i := 0; i < nx; i++ {
-			u := float64(i) / float64(nx)
-			v := float64(j) / float64(ny)
-			scaleHoriz := horizontal.MultiplyNum(u)
-			scaleVert := vertical.MultiplyNum(v)
-			direction := lowerLeftCorner.AddVector(scaleVert).AddVector(scaleHoriz)
-			ray := models.Ray{Origin: origin, Direction: direction}
-
-			// p := ray.PointAtParam(2.0)
-			col := color(ray, world)
+			// Blend pixels
+			col := models.Vector(0, 0, 0)
+			for s := 0; s < ns; s++ {
+				u := (float64(i) + rand.Float64()) / float64(nx)
+				v := (float64(j) + rand.Float64()) / float64(ny)
+				r := cam.GetRay(u, v)
+				// p := r.PointAtParam(2.0)
+				col = col.AddVector(color(r, world))
+			}
+			col = col.DivideNum(float64(ns))
 			ir := int(255.99 * col.E0)
 			ig := int(255.99 * col.E1)
 			ib := int(255.99 * col.E2)
