@@ -1,4 +1,4 @@
-package objects
+package materials
 
 import "golang-ray-tracer/models"
 

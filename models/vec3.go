@@ -1,6 +1,9 @@
 package models
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
 /// Structs are typed collections of fields useful for grouping
 /// data together to form records.
@@ -76,3 +79,16 @@ func (v0 Vec3) Cross(v1 Vec3) Vec3 {
 /// inline const vec3& operator+ () const { return *this; }
 /// inline vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
 /// inline float operator[](int i) const { return e[i];};
+
+func RandomInUnitSphere() Vec3 {
+	var p Vec3
+	for {
+		p = Vec3{E0: rand.Float64(), E1: rand.Float64(), E2: rand.Float64()}
+		p = p.MultiplyNum(2.0)
+		p = p.SubtractVector(Vector(1, 1, 1))
+		if p.SquaredLength() >= 1.0 {
+			break
+		}
+	}
+	return p
+}
