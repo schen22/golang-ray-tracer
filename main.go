@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"golang-ray-tracer/materials"
 	"golang-ray-tracer/models"
 	"golang-ray-tracer/objects"
 	"math"
@@ -10,12 +11,17 @@ import (
 
 /** Linearly blend white and blue
 depending on up/downess of the y-coordinate. */
-func color(r models.Ray, world objects.Hitable) models.Vec3 {
-	var rec objects.HitRecord
-
+func color(r models.Ray, world materials.Hitable, depth int) models.Vec3 {
+	var rec materials.HitRecord
 	if world.Hit(r, 0.001, math.MaxFloat64, &rec) {
-		target := rec.P.AddVector(rec.Normal).AddVector(randomInUnitSphere())
-		return color(models.NewRay(rec.P, target.SubtractVector(rec.P)), world).MultiplyNum(0.5)
+		var scattered models.Ray
+		var attenuation models.Vec3
+
+		if depth < 50 && rec.MaterialPtr.Scatter(&r, &rec, &attenuation, &scattered) {
+			return attenuation.MultiplyVector(color(scattered, world, depth+1))
+		} else {
+			return models.Vector(0, 0, 0)
+		}
 	} else {
 		unitDirection := r.Direction.FindUnitVector()
 		// Scale unit vector so that 0.0 < t < 1.0
@@ -28,19 +34,6 @@ func color(r models.Ray, world objects.Hitable) models.Vec3 {
 	}
 }
 
-func randomInUnitSphere() models.Vec3 {
-	var p models.Vec3
-	for {
-		p = models.Vec3{E0: rand.Float64(), E1: rand.Float64(), E2: rand.Float64()}
-		p = p.MultiplyNum(2.0)
-		p = p.SubtractVector(models.Vector(1, 1, 1))
-		if p.SquaredLength() >= 1.0 {
-			break
-		}
-	}
-	return p
-}
-
 func main() {
 	nx := 200
 	ny := 100
@@ -50,10 +43,13 @@ func main() {
 	horizontal := models.Vector(4, 0, 0)
 	vertical := models.Vector(0, 2, 0)
 	origin := models.Vector(0, 0, 0)
-	list := make([]objects.Hitable, 2)
-	list[0] = objects.Sphere{Center: models.Vector(0, 0, -1), Radius: 0.5}
-	list[1] = objects.Sphere{Center: models.Vector(0, -100.5, -1), Radius: 100}
-	world := objects.HitableList{List: list, ListSize: 2}
+	list := make([]materials.Hitable, 4)
+	list[0] = objects.Sphere{Center: models.Vector(0, 0, -1), Radius: 0.5, Material: materials.Lambertian{Albedo: models.Vector(0.8, 0.3, 0.3)}}
+	list[1] = objects.Sphere{Center: models.Vector(0, -100.5, -1), Radius: 100, Material: materials.Lambertian{Albedo: models.Vector(0.8, 0.8, 0.0)}}
+	list[2] = objects.Sphere{Center: models.Vector(1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.6, 0.2)}}
+	list[3] = objects.Sphere{Center: models.Vector(-1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.8, 0.8)}}
+
+	world := materials.HitableList{List: list, ListSize: 4}
 	cam := objects.NewCamera(origin, lowerLeftCorner, horizontal, vertical)
 	fmt.Printf("P3\n%d %d\n255\n", nx, ny)
 	for j := ny - 1; j >= 0; j-- {
@@ -65,7 +61,7 @@ func main() {
 				v := (float64(j) + rand.Float64()) / float64(ny)
 				r := cam.GetRay(u, v)
 				// p := r.PointAtParam(2.0)
-				col = col.AddVector(color(r, world))
+				col = col.AddVector(color(r, world, 0))
 			}
 			col = col.DivideNum(float64(ns))
 			col = models.Vector(math.Sqrt(col.E0), math.Sqrt(col.E1), math.Sqrt(col.E2))

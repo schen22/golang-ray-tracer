@@ -1,12 +1,13 @@
-package objects
+package materials
 
 import "golang-ray-tracer/models"
 
 // t = time to allow motion blur.
 // p = point vector, normal = the normal of that vector
 type HitRecord struct {
-	T         float64
-	P, Normal models.Vec3
+	T           float64
+	P, Normal   models.Vec3
+	MaterialPtr Material
 }
 
 type Hitable interface {
