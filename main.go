@@ -16,9 +16,7 @@ func color(r models.Ray, world materials.Hitable, depth int) models.Vec3 {
 	if world.Hit(r, 0.001, math.MaxFloat64, &rec) {
 		var scattered models.Ray
 		var attenuation models.Vec3
-		if rec.MaterialPtr == nil {
-			fmt.Printf("materialPtr is nil\n")
-		}
+
 		if depth < 50 && rec.MaterialPtr.Scatter(&r, &rec, &attenuation, &scattered) {
 			return attenuation.MultiplyVector(color(scattered, world, depth+1))
 		} else {
