@@ -2,6 +2,6 @@
 
 Example images produced:
 
-![materials](assets/out8.jpg)
+![materials](assets/out8.png)
 
-![materials](assets/out9.jpg)
+![materials](assets/fuzz1.png)

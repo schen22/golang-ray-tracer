@@ -35,8 +35,8 @@ func color(r models.Ray, world materials.Hitable, depth int) models.Vec3 {
 }
 
 func main() {
-	nx := 200
-	ny := 100
+	nx := 600
+	ny := 300
 	ns := 100
 
 	lowerLeftCorner := models.Vector(-2, -1, -1)
@@ -46,8 +46,8 @@ func main() {
 	list := make([]materials.Hitable, 4)
 	list[0] = objects.Sphere{Center: models.Vector(0, 0, -1), Radius: 0.5, Material: materials.Lambertian{Albedo: models.Vector(0.8, 0.3, 0.3)}}
 	list[1] = objects.Sphere{Center: models.Vector(0, -100.5, -1), Radius: 100, Material: materials.Lambertian{Albedo: models.Vector(0.8, 0.8, 0.0)}}
-	list[2] = objects.Sphere{Center: models.Vector(1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.6, 0.2)}}
-	list[3] = objects.Sphere{Center: models.Vector(-1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.8, 0.8)}}
+	list[2] = objects.Sphere{Center: models.Vector(1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.6, 0.2), Fuzz: 1.0}}
+	list[3] = objects.Sphere{Center: models.Vector(-1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.8, 0.8), Fuzz: 0.3}}
 
 	world := materials.HitableList{List: list, ListSize: 4}
 	cam := objects.NewCamera(origin, lowerLeftCorner, horizontal, vertical)
