@@ -7,6 +7,7 @@ type Metal struct {
 	Fuzz   float64
 }
 
+/** Rays are reflected as (v + 2B) for smooth metals. */
 func Reflect(v models.Vec3, n models.Vec3) models.Vec3 {
 	return v.SubtractVector(n.MultiplyNum(2.0 * v.Dot(n)))
 }
@@ -18,6 +19,8 @@ func (m Metal) Scatter(ray_in *models.Ray, rec *HitRecord, attenuation *models.V
 	if m.Fuzz > 1 {
 		m.Fuzz = 1.0
 	}
+	// Randomize the reflected direction by using a small sphere to choose
+	// a new endpoint for the ray.
 	fuzzFactor := models.RandomInUnitSphere().MultiplyNum(m.Fuzz)
 	*scattered = models.NewRay(rec.P, reflected.AddVector(fuzzFactor))
 	*attenuation = m.Albedo

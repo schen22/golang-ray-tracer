@@ -43,13 +43,16 @@ func main() {
 	horizontal := models.Vector(4, 0, 0)
 	vertical := models.Vector(0, 2, 0)
 	origin := models.Vector(0, 0, 0)
-	list := make([]materials.Hitable, 4)
-	list[0] = objects.Sphere{Center: models.Vector(0, 0, -1), Radius: 0.5, Material: materials.Lambertian{Albedo: models.Vector(0.8, 0.3, 0.3)}}
+	list := make([]materials.Hitable, 5)
+	list[0] = objects.Sphere{Center: models.Vector(0, 0, -1), Radius: 0.5, Material: materials.Lambertian{Albedo: models.Vector(0.1, 0.2, 0.5)}}
 	list[1] = objects.Sphere{Center: models.Vector(0, -100.5, -1), Radius: 100, Material: materials.Lambertian{Albedo: models.Vector(0.8, 0.8, 0.0)}}
-	list[2] = objects.Sphere{Center: models.Vector(1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.6, 0.2), Fuzz: 1.0}}
-	list[3] = objects.Sphere{Center: models.Vector(-1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.8, 0.8), Fuzz: 0.3}}
+	list[2] = objects.Sphere{Center: models.Vector(1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.6, 0.2)}}
+	// list[3] = objects.Sphere{Center: models.Vector(-1, 0, -1), Radius: 0.5, Material: materials.Metal{Albedo: models.Vector(0.8, 0.8, 0.8)}}
+	list[3] = objects.Sphere{Center: models.Vector(-1, 0, -1), Radius: 0.5, Material: materials.Dialectric{Ref_idx: 1.5}}
 
-	world := materials.HitableList{List: list, ListSize: 4}
+	list[4] = objects.Sphere{Center: models.Vector(-1, 0, -1), Radius: -0.45, Material: materials.Dialectric{Ref_idx: 1.5}}
+
+	world := materials.HitableList{List: list, ListSize: 5}
 	cam := objects.NewCamera(origin, lowerLeftCorner, horizontal, vertical)
 	fmt.Printf("P3\n%d %d\n255\n", nx, ny)
 	for j := ny - 1; j >= 0; j-- {
